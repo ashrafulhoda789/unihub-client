@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "@/lib/auth-client"; // BetterAuth hooks
 import {
     Search,
@@ -43,6 +43,12 @@ export default function Navbar() {
             },
         });
     };
+
+    const pathName = usePathname();
+
+    if(pathName.startsWith('/dashboard')){
+        return null;
+    }
 
     return (
         <header className="sticky top-0 z-50 backdrop-blur-md bg-slate-900/90 border-b border-slate-800">

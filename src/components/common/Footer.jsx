@@ -1,8 +1,16 @@
+'use client'
+
 import Link from "next/link";
 import { GraduationCap, Globe, Mail } from "lucide-react";
 import { BsGithub } from "react-icons/bs";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
+    const pathName = usePathname();
+
+    if (pathName.startsWith('/dashboard')) {
+        return null;
+    }
     return (
         <footer className="bg-slate-950 border-t border-slate-800/80 text-slate-400 text-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
