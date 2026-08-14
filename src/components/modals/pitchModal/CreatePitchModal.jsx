@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { X, Lightbulb, Code2, Tags } from "lucide-react";
+import { X, Lightbulb } from "lucide-react";
+import { createPitch } from "@/lib/action/createPitch";
 
 export default function CreatePitchModal({ isOpen, onClose, onPitchCreated, user }) {
     const [formData, setFormData] = useState({
@@ -30,13 +31,8 @@ export default function CreatePitchModal({ isOpen, onClose, onPitchCreated, user
         };
 
         try {
-            const res = await fetch("http://localhost:5000/api/pitches", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-            });
-            const data = await res.json();
-            if (data.success) {
+            const res = await createPitch(payload);
+            if (res?.success) {
                 onPitchCreated();
                 onClose();
                 setFormData({ title: "", category: "Web Dev", description: "", requiredSkills: "", roleInTeam: "Lead Developer" });
@@ -64,7 +60,7 @@ export default function CreatePitchModal({ isOpen, onClose, onPitchCreated, user
                     </div>
                     <div>
                         <h3 className="text-xl font-bold text-white">Create Project Pitch</h3>
-                        <p className="text-xs text-slate-400">Match with peers and supervisors on UniHub[cite: 7].</p>
+                        <p className="text-xs text-slate-400">Match with peers and supervisors on UniHub.</p>
                     </div>
                 </div>
 
@@ -136,7 +132,7 @@ export default function CreatePitchModal({ isOpen, onClose, onPitchCreated, user
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/25 transition-all mt-2"
+                        className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/25 transition-all mt-2 disabled:opacity-50"
                     >
                         {loading ? "Creating Pitch..." : "Publish Pitch"}
                     </button>

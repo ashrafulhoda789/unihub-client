@@ -1,42 +1,55 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Users, ShieldCheck, Check, X, ArrowRight, Lock, Clock, UserPlus, ShieldAlert } from "lucide-react";
+import { finalizePitchTeam, handleJoinRequestAction } from "@/lib/action/createPitch";
 
 export default function PitchCard({ pitch, onUpdate }) {
+    const router = useRouter();
 
-    // Privacy Seal: Finalize Team
-    const handleFinalizeTeam = async () => {
+    const handleCardClick = () => {
+        router.push(`/dashboard/student/my-pitches/${pitch._id}`);
+    };
+
+    const handleFinalizeTeam = async (e) => {
+        e.stopPropagation(); // Card-এর click event আটকানোর জন্য
         if (!confirm("Finalize team? This will lock member recruitment, mark project as ACTIVE, and create your Private Agile Workspace.")) return;
 
         try {
-            const res = await fetch(`http://localhost:5000/api/pitches/${pitch._id}/finalize`, {
-                method: "PATCH",
-            });
-            if (res.ok) onUpdate();
+            const res = await finalizePitchTeam(pitch._id);
+            if (res?.success) {
+                onUpdate();
+            }
         } catch (err) {
-            console.error(err);
+            console.error("Error finalizing pitch team:", err);
         }
     };
 
     // Peer Request Action
-    const handleRequestAction = async (requestId, action) => {
+    const handleRequestAction = async (e, requestId, action) => {
+        e.stopPropagation(); // Card-এর click event আটকানোর জন্য
         try {
-            const res = await fetch(`http://localhost:5000/api/pitches/${pitch._id}/request-action`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ requestId, action, roleInTeam: "Developer" }),
+            const res = await handleJoinRequestAction(pitch._id, {
+                requestId,
+                action,
+                roleInTeam: "Developer"
             });
-            if (res.ok) onUpdate();
+            if (res?.success) {
+                onUpdate();
+            }
         } catch (err) {
-            console.error(err);
+            console.error("Error processing request action:", err);
         }
     };
 
     const pendingRequests = pitch.joinRequests?.filter(r => r.status === "PENDING") || [];
 
     return (
-        <div className="bg-slate-900/80 border border-slate-800 hover:border-slate-700/80 rounded-2xl p-6 shadow-xl transition-all relative flex flex-col justify-between">
+        <div
+            onClick={handleCardClick}
+            className="bg-slate-900/80 border border-slate-800 hover:border-slate-700/80 rounded-2xl p-6 shadow-xl transition-all relative flex flex-col justify-between cursor-pointer hover:bg-slate-900/90 group"
+        >
             <div>
                 {/* Category & Status Badges */}
                 <div className="flex items-center justify-between mb-3">
@@ -57,7 +70,7 @@ export default function PitchCard({ pitch, onUpdate }) {
                     </div>
                 </div>
 
-                <h3 className="text-lg font-bold text-white mb-2">{pitch.title}</h3>
+                <h3 className="text-lg font-bold text-white mb-2 group-hover:text-indigo-300 transition-colors">{pitch.title}</h3>
                 <p className="text-xs text-slate-400 line-clamp-3 mb-4">{pitch.description}</p>
 
                 {/* Required Skills */}
@@ -105,14 +118,14 @@ export default function PitchCard({ pitch, onUpdate }) {
                                     <p className="text-slate-300 text-[11px] truncate max-w-[150px]">{req.message}</p>
                                     <div className="flex gap-1">
                                         <button
-                                            onClick={() => handleRequestAction(req._id, "ACCEPTED")}
-                                            className="p-1 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white rounded"
+                                            onClick={(e) => handleRequestAction(e, req._id, "ACCEPTED")}
+                                            className="p-1 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white rounded transition-colors"
                                         >
                                             <Check className="w-3.5 h-3.5" />
                                         </button>
                                         <button
-                                            onClick={() => handleRequestAction(req._id, "REJECTED")}
-                                            className="p-1 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded"
+                                            onClick={(e) => handleRequestAction(e, req._id, "REJECTED")}
+                                            className="p-1 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded transition-colors"
                                         >
                                             <X className="w-3.5 h-3.5" />
                                         </button>
@@ -129,6 +142,7 @@ export default function PitchCard({ pitch, onUpdate }) {
                 {pitch.isFinalized ? (
                     <Link
                         href={`/dashboard/student/workspace/${pitch.workspaceId || pitch._id}`}
+                        onClick={(e) => e.stopPropagation()} // Card navigation আটকানোর জন্য
                         className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-600/20"
                     >
                         Enter Agile Workspace <ArrowRight className="w-3.5 h-3.5" />
