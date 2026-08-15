@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Users, ShieldCheck, Check, X, ArrowRight, Lock, Clock, UserPlus, ShieldAlert } from "lucide-react";
-import { finalizePitchTeam, handleJoinRequestAction } from "@/lib/action/createPitch";
+import { Users, ShieldCheck, ArrowRight, Lock, Clock, UserPlus, ShieldAlert } from "lucide-react";
+import { finalizePitchTeam } from "@/lib/action/createPitch";
 
 export default function PitchCard({ pitch, onUpdate }) {
     const router = useRouter();
@@ -13,7 +13,7 @@ export default function PitchCard({ pitch, onUpdate }) {
     };
 
     const handleFinalizeTeam = async (e) => {
-        e.stopPropagation(); // Card-এর click event আটকানোর জন্য
+        e.stopPropagation();
         if (!confirm("Finalize team? This will lock member recruitment, mark project as ACTIVE, and create your Private Agile Workspace.")) return;
 
         try {
@@ -26,24 +26,8 @@ export default function PitchCard({ pitch, onUpdate }) {
         }
     };
 
-    // Peer Request Action
-    const handleRequestAction = async (e, requestId, action) => {
-        e.stopPropagation(); // Card-এর click event আটকানোর জন্য
-        try {
-            const res = await handleJoinRequestAction(pitch._id, {
-                requestId,
-                action,
-                roleInTeam: "Developer"
-            });
-            if (res?.success) {
-                onUpdate();
-            }
-        } catch (err) {
-            console.error("Error processing request action:", err);
-        }
-    };
-
-    const pendingRequests = pitch.joinRequests?.filter(r => r.status === "PENDING") || [];
+    // Pending Requests Count
+    const pendingRequestsCount = pitch.joinRequests?.filter(r => r.status === "PENDING").length || 0;
 
     return (
         <div
@@ -51,19 +35,30 @@ export default function PitchCard({ pitch, onUpdate }) {
             className="bg-slate-900/80 border border-slate-800 hover:border-slate-700/80 rounded-2xl p-6 shadow-xl transition-all relative flex flex-col justify-between cursor-pointer hover:bg-slate-900/90 group"
         >
             <div>
-                {/* Category & Status Badges */}
+                {/* Category & Badges */}
                 <div className="flex items-center justify-between mb-3">
                     <span className="px-2.5 py-1 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold">
                         {pitch.category}
                     </span>
 
                     <div className="flex items-center gap-2">
+                        {/* Request Count Badge (Only Icon + Count) */}
+                        {pendingRequestsCount > 0 && (
+                            <span
+                                title={`${pendingRequestsCount} pending join request(s)`}
+                                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold animate-pulse"
+                            >
+                                <UserPlus className="w-3.5 h-3.5" />
+                                <span>{pendingRequestsCount}</span>
+                            </span>
+                        )}
+
                         {pitch.isFinalized ? (
                             <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
                                 <Lock className="w-3 h-3" /> ACTIVE
                             </span>
                         ) : (
-                            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold">
+                            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700/60 text-slate-300 text-xs font-semibold">
                                 <Clock className="w-3 h-3" /> {pitch.status}
                             </span>
                         )}
@@ -105,36 +100,6 @@ export default function PitchCard({ pitch, onUpdate }) {
                         ))}
                     </div>
                 </div>
-
-                {/* Join Requests */}
-                {!pitch.isFinalized && pendingRequests.length > 0 && (
-                    <div className="p-3 bg-slate-800/40 border border-indigo-500/20 rounded-xl mb-4">
-                        <h5 className="text-xs font-semibold text-indigo-300 mb-2 flex items-center gap-1">
-                            <UserPlus className="w-3.5 h-3.5" /> Peer Join Requests ({pendingRequests.length})
-                        </h5>
-                        <div className="space-y-2">
-                            {pendingRequests.map((req) => (
-                                <div key={req._id} className="flex items-center justify-between text-xs bg-slate-900 p-2 rounded-lg">
-                                    <p className="text-slate-300 text-[11px] truncate max-w-[150px]">{req.message}</p>
-                                    <div className="flex gap-1">
-                                        <button
-                                            onClick={(e) => handleRequestAction(e, req._id, "ACCEPTED")}
-                                            className="p-1 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white rounded transition-colors"
-                                        >
-                                            <Check className="w-3.5 h-3.5" />
-                                        </button>
-                                        <button
-                                            onClick={(e) => handleRequestAction(e, req._id, "REJECTED")}
-                                            className="p-1 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded transition-colors"
-                                        >
-                                            <X className="w-3.5 h-3.5" />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
             </div>
 
             {/* Action Footer */}
@@ -142,7 +107,7 @@ export default function PitchCard({ pitch, onUpdate }) {
                 {pitch.isFinalized ? (
                     <Link
                         href={`/dashboard/student/workspace/${pitch.workspaceId || pitch._id}`}
-                        onClick={(e) => e.stopPropagation()} // Card navigation আটকানোর জন্য
+                        onClick={(e) => e.stopPropagation()}
                         className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-600/20"
                     >
                         Enter Agile Workspace <ArrowRight className="w-3.5 h-3.5" />
