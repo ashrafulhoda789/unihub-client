@@ -115,7 +115,7 @@ export default function PitchCard({ pitch, onUpdate, currentUserId }) {
             <div className="pt-4 border-t border-slate-800/80">
                 {pitch.isFinalized ? (
                     <Link
-                        href={`/dashboard/student/workspace/${pitch.workspaceId || pitch._id}`}
+                        href={`/dashboard/student/my-pitches/${pitch.workspaceId || pitch._id}/workspace`}
                         onClick={(e) => e.stopPropagation()}
                         className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-600/20"
                     >

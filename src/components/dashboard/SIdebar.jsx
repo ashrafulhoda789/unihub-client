@@ -34,7 +34,6 @@ export default function Sidebar() {
     // Navigation Links based on Role
     const studentNav = [
         { name: "My Pitches", href: "/dashboard/student/my-pitches", icon: FolderGit2 },
-        { name: "Agile Workspace", href: "/dashboard/student/workspace", icon: Kanban },
         { name: "My Pitch Request", href: "/dashboard/student/pitch-request", icon: FolderCheck },
         { name: "IDE Sandbox", href: "/ide", icon: Code2 },
         { name: "Profile", href: "/dashboard/student/profile", icon: User },

@@ -1,9 +1,8 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Users, ArrowRight, Tag, Sparkles } from 'lucide-react';
+import { Search, Filter, Users, ArrowRight, Sparkles, Lock, Clock, CheckCircle2 } from 'lucide-react';
 import { getAllPitches } from '@/lib/api/myPitch';
 import Link from 'next/link';
-
 
 const CATEGORIES = ["All", "DSA", "Web Dev", "Machine Learning", "Embedded Systems", "Cyber Security"];
 
@@ -21,7 +20,6 @@ const PitchesPage = () => {
     const fetchPitches = async () => {
         setLoading(true);
         try {
-           
             const res = await getAllPitches({ category: selectedCategory, search });
             if (res?.success) {
                 setPitches(res.data);
@@ -38,6 +36,34 @@ const PitchesPage = () => {
         fetchPitches();
     };
 
+    // Helper Function for Pitch Status Badge
+    const renderStatusBadge = (pitch) => {
+        const isLocked = pitch.isFinalized;
+        const isExpired = pitch.expiresAt && new Date(pitch.expiresAt) < new Date();
+
+        if (isLocked) {
+            return (
+                <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    <Lock className="w-3 h-3" /> Locked
+                </span>
+            );
+        }
+
+        if (isExpired) {
+            return (
+                <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                    <Clock className="w-3 h-3" /> Expired
+                </span>
+            );
+        }
+
+        return (
+            <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <CheckCircle2 className="w-3 h-3" /> Active
+            </span>
+        );
+    };
+
     return (
         <div className="min-h-screen bg-slate-950 text-slate-100 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
@@ -48,7 +74,7 @@ const PitchesPage = () => {
                         <Sparkles className="w-3.5 h-3.5" /> Innovation Hub
                     </span>
                     <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
-                        Explore Student <span className="text-indigo-500">Pitches</span>
+                        Explore Innovative <span className="text-indigo-500">Pitches</span>
                     </h1>
                     <p className="text-slate-400 text-base sm:text-lg">
                         Discover academic projects, collaborate with peers, or find teams looking for your skills.
@@ -75,8 +101,8 @@ const PitchesPage = () => {
                                     key={cat}
                                     onClick={() => setSelectedCategory(cat)}
                                     className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${selectedCategory === cat
-                                            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
-                                            : 'bg-slate-800/80 text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
+                                        : 'bg-slate-800/80 text-slate-400 hover:bg-slate-800 hover:text-slate-200'
                                         }`}
                                 >
                                     {cat}
@@ -108,10 +134,11 @@ const PitchesPage = () => {
                                         <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                                             {pitch.category}
                                         </span>
-                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                                            {pitch.status}
-                                        </span>
+
+                                        {/* Dynamic Status Badge */}
+                                        {renderStatusBadge(pitch)}
                                     </div>
+
                                     <h2 className="text-xl font-bold text-slate-100 group-hover:text-indigo-400 transition-colors line-clamp-1 mb-2">
                                         {pitch.title}
                                     </h2>
@@ -132,9 +159,21 @@ const PitchesPage = () => {
                                     <span className="text-xs text-slate-400 flex items-center gap-1">
                                         <Users className="w-3.5 h-3.5 text-slate-500" /> {pitch.members?.length || 1} Member(s)
                                     </span>
-                                    <Link href={`/pitches/${pitch._id}`} className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-400 hover:text-indigo-300">
-                                        View Details <ArrowRight className="w-3.5 h-3.5" />
-                                    </Link>
+                                    {pitch.expiresAt && new Date(pitch.expiresAt) < new Date() ? (
+                                        <button
+                                            disabled
+                                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 cursor-not-allowed opacity-60"
+                                        >
+                                            Expired <ArrowRight className="w-3.5 h-3.5" />
+                                        </button>
+                                    ) : (
+                                        <Link
+                                            href={`/pitches/${pitch._id}`}
+                                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-400 hover:text-indigo-300"
+                                        >
+                                            View Details <ArrowRight className="w-3.5 h-3.5" />
+                                        </Link>
+                                    )}
                                 </div>
                             </div>
                         ))}

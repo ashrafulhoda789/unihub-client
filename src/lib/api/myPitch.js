@@ -17,5 +17,7 @@ export const getPitchForSpecificUser = async (userId) => {
 };
 
 export const getPitchById = async (pitchId) => {
-    return await serverFetch(`/api/pitches/${pitchId}`);
+    return await serverFetch(`/api/pitches/${pitchId}`,{
+        cache: 'no-store',
+    });
 };
