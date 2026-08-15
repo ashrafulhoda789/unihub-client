@@ -1,3 +1,4 @@
+'use server'
 import { serverMutation } from "../core/server";
 
 export const assignSupervisor = async (pitchId, supervisorData) => {

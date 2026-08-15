@@ -1,19 +1,39 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Send, CheckCircle2, Loader2 } from 'lucide-react';
+import { Send, CheckCircle2, Loader2, Lock } from 'lucide-react';
 import { submitJoinRequest } from '@/lib/action/joinRequest';
 import { authClient } from '@/lib/auth-client';
 
-export default function JoinRequestForm({ pitchId }) {
+export default function JoinRequestForm({ pitchId, isFinalized }) {
     const [isApplying, setIsApplying] = useState(false);
     const [applicantRole, setApplicantRole] = useState('');
     const [applicationMessage, setApplicationMessage] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [submittedSuccess, setSubmittedSuccess] = useState(false);
 
+    if (isFinalized) {
+        return (
+            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 text-center">
+                <div className="w-10 h-10 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Lock className="w-5 h-5" />
+                </div>
+                <h4 className="text-sm font-bold text-white mb-1">Team Recruitment Locked</h4>
+                <p className="text-xs text-slate-400">
+                    This pitch has been finalized by the creator. New join requests are no longer accepted.
+                </p>
+                <button
+                    disabled
+                    className="w-full mt-4 py-2.5 bg-slate-800 text-slate-500 font-semibold text-xs rounded-xl cursor-not-allowed border border-slate-700/50"
+                >
+                    Application Closed
+                </button>
+            </div>
+        );
+    }
+
     const { data: session } = authClient.useSession();
-    const user =  session?.user;
+    const user = session?.user;
 
     const handleJoinSubmit = async (e) => {
         e.preventDefault();

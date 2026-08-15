@@ -1,14 +1,12 @@
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Users, Calendar, Clock, Code } from 'lucide-react';
+import { ArrowLeft, Users, Calendar, Clock, Code, Lock } from 'lucide-react';
 import { getPitchById } from '@/lib/api/myPitch';
 import JoinRequestForm from '@/components/modals/pitchModal/JoinRequestForm';
-
 
 const PitchDetailPage = async ({ params }) => {
     const { id } = await params;
 
-    // Server Side Direct Fetch
     let pitch = null;
     try {
         const res = await getPitchById(id);
@@ -28,6 +26,9 @@ const PitchDetailPage = async ({ params }) => {
         );
     }
 
+    // Lock check condition
+    const isLocked = pitch.isFinalized === true;
+
     return (
         <div className="min-h-screen bg-slate-950 text-slate-100 py-10 px-4 sm:px-6 lg:px-8">
             <div className="max-w-5xl mx-auto">
@@ -44,9 +45,15 @@ const PitchDetailPage = async ({ params }) => {
                                 <span className="px-3 py-1 rounded-md text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                                     {pitch.category}
                                 </span>
-                                <span className="text-xs font-bold px-2.5 py-1 rounded-full uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                                    {pitch.status}
-                                </span>
+                                {isLocked ? (
+                                    <span className="text-xs font-bold px-2.5 py-1 rounded-full uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                                        <Lock className="w-3 h-3" /> LOCKED 
+                                    </span>
+                                ) : (
+                                    <span className="text-xs font-bold px-2.5 py-1 rounded-full uppercase bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                                        {pitch.status}
+                                    </span>
+                                )}
                             </div>
                             <h1 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">{pitch.title}</h1>
                             <div className="flex flex-wrap items-center gap-6 text-xs text-slate-400 pt-4 border-t border-slate-800">
@@ -80,24 +87,33 @@ const PitchDetailPage = async ({ params }) => {
 
                     {/* Sidebar */}
                     <div className="space-y-6">
-                        {/* Interactive Client Form */}
-                        <JoinRequestForm pitchId={id} />
+                        {/* Interactive Client Form with Lock state */}
+                        <JoinRequestForm pitchId={id} isFinalized={isLocked} />
 
+                        {/* Current Team Members List with Names */}
                         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
                             <h3 className="text-base font-bold text-white mb-4 flex items-center gap-2">
                                 <Users className="w-4 h-4 text-indigo-400" /> Current Team ({pitch.members?.length || 0})
                             </h3>
                             <div className="space-y-3">
-                                {pitch.members?.map((m, idx) => (
-                                    <div key={idx} className="flex items-center gap-2.5 bg-slate-950 border border-slate-800 p-3 rounded-xl">
-                                        <div className="w-8 h-8 rounded-full bg-indigo-600/20 text-indigo-400 font-bold text-xs flex items-center justify-center">
-                                            {m.roleInTeam?.charAt(0) || "M"}
-                                        </div>
-                                        <div>
-                                            <p className="text-xs font-semibold text-slate-200">{m.roleInTeam || "Team Member"}</p>
-                                        </div>
-                                    </div>
-                                ))}
+                                {pitch.members && pitch.members.length > 0 ? (
+                                    pitch.members.map((m, idx) => {
+                                        const memberName = m.name || m.userName || m.applicantName || m.user?.name || "Team Member";
+                                        return (
+                                            <div key={idx} className="flex items-center gap-3 bg-slate-950 border border-slate-800 p-3 rounded-xl">
+                                                <div className="w-8 h-8 rounded-full bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 font-bold text-xs flex items-center justify-center shrink-0">
+                                                    {memberName.charAt(0).toUpperCase()}
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="text-xs font-bold text-slate-100 truncate">{memberName}</p>
+                                                    <p className="text-[11px] font-medium text-indigo-400 truncate">{m.roleInTeam || m.role || "Member"}</p>
+                                                </div>
+                                            </div>
+                                        );
+                                    })
+                                ) : (
+                                    <p className="text-xs text-slate-500 italic">No members joined yet.</p>
+                                )}
                             </div>
                         </div>
                     </div>
