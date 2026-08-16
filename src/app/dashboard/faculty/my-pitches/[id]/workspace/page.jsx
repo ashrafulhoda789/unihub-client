@@ -13,9 +13,9 @@ export default async function WorkspacePage({ params }) {
         headers: reqHeaders,
     });
 
-    // console.log('session parent', session);
-    const currentUserId = session?.user?.id || session?.data?.user?.id || session?.user?._id || null;
+    const currentUserId = session?.user?.id || session?.data?.user?.id;
     // console.log("Current User ID:", currentUserId);
+    // console.log('session', session);
 
     let pitch = null;
     let initialTasks = [];
@@ -33,12 +33,9 @@ export default async function WorkspacePage({ params }) {
 
             initialTasks = tasksRes?.data || tasksRes?.tasks || tasksRes || [];
         }
-
     } catch (error) {
         console.error("Error fetching pitch details:", error);
     }
-
-    // console.log('initial task', initialTasks);
 
     if (!pitch || (!pitch._id && !pitch.id)) {
         return (
@@ -50,13 +47,11 @@ export default async function WorkspacePage({ params }) {
         );
     }
 
-
-
     return (
         <WorkspaceView
             workspace={pitch}
             initialTasks={initialTasks}
-            currentUserId={currentUserId ? String(currentUserId) : null}
+            currentUserId={currentUserId}
         />
     );
 }

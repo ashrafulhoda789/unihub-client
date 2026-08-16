@@ -1,4 +1,4 @@
-
+// src/components/dashboard/workspace/WorkspaceView.jsx
 "use client";
 
 import CreateTaskModal from "@/components/dashboard/workspace/CreateTaskModal";
@@ -9,14 +9,15 @@ import { CgAdd } from "react-icons/cg";
 
 
 export default function WorkspaceView({ workspace, initialTasks, currentUserId }) {
+ 
     const [tasks, setTasks] = useState(initialTasks || []);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-    // console.log('workspace view', currentUserId);
 
     const isSupervisor = workspace?.supervisorId?.toString() === currentUserId;
     const leadMember = workspace?.members?.find((m) => m.roleInTeam === "Lead Developer");
     const isLeadDev = leadMember && leadMember.userId?.toString() === currentUserId;
+
 
     const handleTaskCreated = (newTask) => {
         setTasks((prev) => [newTask, ...prev]);
@@ -51,7 +52,7 @@ export default function WorkspaceView({ workspace, initialTasks, currentUserId }
                         onClick={() => setIsCreateModalOpen(true)}
                         className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg shadow-lg shadow-indigo-600/20 transition-all flex items-center gap-1.5"
                     >
-                        <span><CgAdd/></span> Create Task
+                        <span><CgAdd /></span> Create Task
                     </button>
                 )}
             </div>

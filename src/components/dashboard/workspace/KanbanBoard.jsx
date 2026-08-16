@@ -57,7 +57,6 @@ export default function KanbanBoard({
             if (res.success) {
                 onTaskUpdated(taskId, targetStatus, submissionUrl);
 
-                // Active Detail Modal থাকলে সেখানেও স্টেট আপডেট রাখা
                 if (selectedTaskForDetail && selectedTaskForDetail._id === taskId) {
                     setSelectedTaskForDetail((prev) => ({ ...prev, status: targetStatus, submissionUrl }));
                 }

@@ -40,8 +40,8 @@ export default function Sidebar() {
     ];
 
     const facultyNav = [
-        { name: "Supervision Requests", href: "/dashboard/faculty/requests", icon: CheckSquare },
-        { name: "Assigned Projects", href: "/dashboard/faculty/projects", icon: FolderGit2 },
+        { name: "My Pitch", href: "/dashboard/faculty/my-pitches", icon: FolderGit2 },
+        { name: "Supervision Requests", href: "/dashboard/faculty/pitch-requests", icon: CheckSquare },
         { name: "Curriculum & Resources", href: "/resources", icon: BookOpen },
         { name: "Profile", href: "/dashboard/faculty/profile", icon: User },
     ];
