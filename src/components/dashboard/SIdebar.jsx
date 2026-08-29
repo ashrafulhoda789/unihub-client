@@ -42,7 +42,7 @@ export default function Sidebar() {
     const facultyNav = [
         { name: "My Pitch", href: "/dashboard/faculty/my-pitches", icon: FolderGit2 },
         { name: "Supervision Requests", href: "/dashboard/faculty/faculty-pitch-request", icon: CheckSquare },
-        { name: "Curriculum & Resources", href: "/resources", icon: BookOpen },
+        { name: "Curriculum & Resources", href: "/dashboard/faculty/resources", icon: BookOpen },
         { name: "Profile", href: "/dashboard/faculty/profile", icon: User },
     ];
 
