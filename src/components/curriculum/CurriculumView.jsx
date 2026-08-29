@@ -6,7 +6,7 @@ import CurriculumModal from './CurriculumModal';
 import { getResources } from '@/lib/api/curriculum';
 import { addCurriculumResource, updateResources, deleteResources } from '@/lib/action/curriculum';
 import { BookCopy } from 'lucide-react';
-import { useSession } from '@/lib/auth-client'; // অথবা আপনার Client Session Hook (e.g. authClient.useSession())
+import { useSession } from '@/lib/auth-client'; 
 
 export default function CurriculumView() {
     const [resources, setResources] = useState([]);
@@ -15,7 +15,6 @@ export default function CurriculumView() {
     const [selectedResource, setSelectedResource] = useState(null);
     const [submitting, setSubmitting] = useState(false);
 
-    // ক্লায়েন্ট কম্পোনেন্টে সেশন রিড করা
     const { data: session } = useSession();
     const userEmail = session?.user?.email;
 
@@ -23,7 +22,6 @@ export default function CurriculumView() {
         if (!userEmail) return;
         try {
             setLoading(true);
-            // লগইন করা টিচারের ইমেইল পাস করা হচ্ছে
             const res = await getResources(userEmail);
             if (res?.data) {
                 setResources(res.data);
@@ -45,7 +43,7 @@ export default function CurriculumView() {
     const handleFormSubmit = async (formData) => {
         setSubmitting(true);
         try {
-            // ফর্ম পেলোডে uploadedBy ইমেইল যুক্ত করা
+           
             const payload = {
                 ...formData,
                 uploadedBy: userEmail

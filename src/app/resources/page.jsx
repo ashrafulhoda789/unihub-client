@@ -1,29 +1,47 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { Search, BookOpen, Layers, Filter, FileCode } from 'lucide-react';
-import { getPublicCurriculum } from '@/lib/api/curriculum';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { Search, BookOpen, Filter } from 'lucide-react';
+import { getPublicCurriculum } from '@/lib/api/curriculum';
 
 const SEMESTERS = ['All', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th'];
 const DEPARTMENTS = ['CSE', 'EEE', 'ECE', 'Civil'];
 
 export default function LandingCurriculumPage() {
-    const [selectedDept, setSelectedDept] = useState('CSE');
-    const [selectedSemester, setSelectedSemester] = useState('All');
-    const [searchQuery, setSearchQuery] = useState('');
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    const selectedDept = searchParams.get('department') || 'CSE';
+    const selectedSemester = searchParams.get('semester') || 'All';
+    const searchQuery = searchParams.get('q') || '';
+
     const [resources, setResources] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeCourse, setActiveCourse] = useState(null);
 
-    // Fetch Data on Filter Change
+    const updateQueryParams = useCallback((key, value) => {
+        const params = new URLSearchParams(searchParams.toString());
+
+        if (value && value !== 'All' && value.trim() !== '') {
+            params.set(key, value);
+        } else {
+            params.delete(key);
+        }
+
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    }, [pathname, router, searchParams]);
+
     useEffect(() => {
         const fetchCurriculum = async () => {
             setLoading(true);
             try {
-                const res = await getPublicCurriculum(selectedDept, selectedSemester);
+                const res = await getPublicCurriculum(selectedDept, selectedSemester, searchQuery);
                 if (res?.data) {
                     setResources(res.data);
+                } else {
+                    setResources([]);
                 }
             } catch (error) {
                 console.error("Failed to load curriculum:", error);
@@ -31,20 +49,13 @@ export default function LandingCurriculumPage() {
                 setLoading(false);
             }
         };
-        fetchCurriculum();
-    }, [selectedDept, selectedSemester]);
 
-    // Client-side Search Filter
-    const filteredResources = useMemo(() => {
-        return resources.filter(item => {
-            const query = searchQuery.toLowerCase();
-            return (
-                item.title?.toLowerCase().includes(query) ||
-                item.courseName?.toLowerCase().includes(query) ||
-                item.courseId?.toLowerCase().includes(query)
-            );
-        });
-    }, [resources, searchQuery]);
+        const timer = setTimeout(() => {
+            fetchCurriculum();
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [selectedDept, selectedSemester, searchQuery]);
 
     return (
         <div className="min-h-screen bg-[#070c18] text-slate-100 py-12 px-4 sm:px-6 lg:px-8">
@@ -59,11 +70,11 @@ export default function LandingCurriculumPage() {
                         Explore Our Curriculum
                     </h1>
                     <p className="text-sm sm:text-base text-slate-400">
-                        Browse course modules, lecture slides, syllabus guidelines, and academic reference materials across all semesters.
+                        Browse course modules, lecture slides, syllabus guidelines, and academic reference materials.
                     </p>
                 </div>
 
-                {/* Filters & Search Control Bar */}
+                {/* Control Bar: Department, Search & Semester */}
                 <div className="bg-[#0d1527]/80 backdrop-blur-md p-4 sm:p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
 
@@ -75,10 +86,10 @@ export default function LandingCurriculumPage() {
                                 {DEPARTMENTS.map(dept => (
                                     <button
                                         key={dept}
-                                        onClick={() => setSelectedDept(dept)}
+                                        onClick={() => updateQueryParams('department', dept)}
                                         className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all ${selectedDept === dept
-                                            ? 'bg-indigo-600 text-white shadow-md'
-                                            : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                                                ? 'bg-indigo-600 text-white shadow-md'
+                                                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
                                             }`}
                                     >
                                         {dept}
@@ -93,7 +104,7 @@ export default function LandingCurriculumPage() {
                             <input
                                 type="text"
                                 value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onChange={(e) => updateQueryParams('q', e.target.value)}
                                 placeholder="Search course code, name or title..."
                                 className="w-full bg-slate-900/80 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-indigo-500 outline-none transition-all"
                             />
@@ -106,10 +117,10 @@ export default function LandingCurriculumPage() {
                             {SEMESTERS.map(sem => (
                                 <button
                                     key={sem}
-                                    onClick={() => setSelectedSemester(sem)}
+                                    onClick={() => updateQueryParams('semester', sem)}
                                     className={`px-4 py-2 text-xs font-medium rounded-xl whitespace-nowrap transition-all ${selectedSemester === sem
-                                        ? 'bg-slate-800 text-indigo-400 border border-indigo-500/30 font-semibold'
-                                        : 'text-slate-400 hover:bg-slate-900/50 hover:text-slate-200'
+                                            ? 'bg-slate-800 text-indigo-400 border border-indigo-500/30 font-semibold'
+                                            : 'text-slate-400 hover:bg-slate-900/50 hover:text-slate-200'
                                         }`}
                                 >
                                     {sem === 'All' ? 'All Semesters' : `${sem} Semester`}
@@ -124,15 +135,15 @@ export default function LandingCurriculumPage() {
                     <div className="text-center py-20 text-slate-500 animate-pulse font-medium">
                         Fetching curriculum structure...
                     </div>
-                ) : filteredResources.length === 0 ? (
+                ) : resources.length === 0 ? (
                     <div className="text-center py-20 bg-[#0d1527]/40 rounded-2xl border border-dashed border-slate-800 p-8">
                         <BookOpen size={40} className="mx-auto text-slate-600 mb-3" />
                         <p className="text-slate-300 font-semibold text-lg">No curriculum materials found.</p>
-                        <p className="text-xs text-slate-500 mt-1">Try selecting a different department or semester filter.</p>
+                        <p className="text-xs text-slate-500 mt-1">Try selecting a different department, semester, or search query.</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredResources.map((item) => (
+                        {resources.map((item) => (
                             <Link
                                 key={item._id}
                                 href={`/resources/${item._id}`}
@@ -170,7 +181,6 @@ export default function LandingCurriculumPage() {
                         ))}
                     </div>
                 )}
-
             </div>
         </div>
     );
