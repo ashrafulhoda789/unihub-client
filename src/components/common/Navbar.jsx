@@ -82,7 +82,7 @@ export default function Navbar() {
                             <FolderGit2 className="w-4 h-4" /> Pitches
                         </Link>
                         <Link href="/resources" className="hover:text-indigo-400 transition-colors">Curriculum</Link>
-                        <Link href="/ide" className="hover:text-indigo-400 transition-colors flex items-center gap-1.5">
+                        <Link href="/sandbox" className="hover:text-indigo-400 transition-colors flex items-center gap-1.5">
                             <Code2 className="w-4 h-4 text-cyan-400" /> IDE Sandbox
                         </Link>
                     </nav>
