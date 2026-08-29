@@ -1,5 +1,6 @@
 'use client';
 
+import { uploadToCloudinary } from '@/lib/upload';
 import { useState, useEffect } from 'react';
 
 export default function CurriculumModal({ isOpen, onClose, onSubmit, initialData = null, isSubmitting = false }) {
@@ -44,8 +45,15 @@ export default function CurriculumModal({ isOpen, onClose, onSubmit, initialData
 
         setUploading(true);
         try {
-            // TODO: Connect Cloudinary upload function here
-            setFormData(prev => ({ ...prev, fileUrl: URL.createObjectURL(file) }));
+            const uploadRes = await uploadToCloudinary(file);
+
+            if (uploadRes?.url) {
+                setFormData(prev => ({
+                    ...prev,
+                    fileUrl: uploadRes.url,
+                    documentType: uploadRes.type // 'pdf' | 'image' | 'video' | 'document'
+                }));
+            }
         } catch (error) {
             console.error("Upload failed:", error);
         } finally {
