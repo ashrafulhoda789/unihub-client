@@ -7,11 +7,16 @@ export const getPitchJoinRequests = async (pitchId, status = '') => {
     });
 };
 
-
-export const getUserJoinRequests = async (userId) => {
-    return await serverFetch(`/api/pitches/join-requests/user/${userId}`, {
-        cache: 'no-store',
+export const getUserJoinRequests = async (userId, { q = '', status = 'ALL', category = 'ALL', page = 1, limit = 6 } = {}) => {
+    const params = new URLSearchParams({
+        q,
+        status,
+        category,
+        page: page.toString(),
+        limit: limit.toString()
     });
+
+    return await serverFetch(`/api/pitches/join-requests/user/${userId}?${params.toString()}`);
 };
 
 export const getOwnerIncomingRequests = async (ownerId, status = '') => {

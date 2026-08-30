@@ -1,42 +1,116 @@
-'use client'
-import React, { useState, useEffect } from 'react';
+'use client';
+
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Search, Filter, Users, ArrowRight, Sparkles, Lock, Clock, CheckCircle2 } from 'lucide-react';
 import { getAllPitches } from '@/lib/api/myPitch';
 import Link from 'next/link';
+import Pagination from '@/components/common/Pagination';
 
 const CATEGORIES = ["All", "DSA", "Web Dev", "Machine Learning", "Embedded Systems", "Cyber Security"];
 
-const PitchesPage = () => {
+const PitchesContent = () => {
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    // URL Param values
+    const categoryFromUrl = searchParams.get('category') || 'All';
+    const searchFromUrl = searchParams.get('search') || '';
+    const pageFromUrl = parseInt(searchParams.get('page'), 10) || 1;
+    const limit = 9;
+
     const [pitches, setPitches] = useState([]);
+    const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(true);
-    const [search, setSearch] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('All');
+    const [search, setSearch] = useState(searchFromUrl);
+    const [selectedCategory, setSelectedCategory] = useState(categoryFromUrl);
 
-    useEffect(() => {
-        // eslint-disable-next-line react-hooks/immutability
-        fetchPitches();
-    }, [selectedCategory]);
+    // Helper: Update URL Parameters
+    const updateUrlParams = useCallback((newCategory, newSearch, newPage = 1) => {
+        const params = new URLSearchParams(searchParams.toString());
 
-    const fetchPitches = async () => {
-        setLoading(true);
-        try {
-            const res = await getAllPitches({ category: selectedCategory, search });
-            if (res?.success) {
-                setPitches(res.data);
-            }
-        } catch (err) {
-            console.error("Failed to fetch pitches:", err);
-        } finally {
-            setLoading(false);
+        if (newCategory && newCategory !== 'All') {
+            params.set('category', newCategory);
+        } else {
+            params.delete('category');
         }
-    };
 
-    const handleSearch = (e) => {
-        e.preventDefault();
+        if (newSearch && newSearch.trim() !== '') {
+            params.set('search', newSearch.trim());
+        } else {
+            params.delete('search');
+        }
+
+        if (newPage > 1) {
+            params.set('page', newPage.toString());
+        } else {
+            params.delete('page');
+        }
+
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    }, [pathname, router, searchParams]);
+
+    // Live Debounce Search Input
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (search !== searchFromUrl) {
+                updateUrlParams(selectedCategory, search, 1);
+            }
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [search, selectedCategory, searchFromUrl, updateUrlParams]);
+
+    // Sync input states when URL changes directly (e.g. Back/Forward navigation)
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setSelectedCategory(categoryFromUrl);
+        setSearch(searchFromUrl);
+    }, [categoryFromUrl, searchFromUrl]);
+
+    // Fetch API Data
+    useEffect(() => {
+        const fetchPitches = async () => {
+            setLoading(true);
+            try {
+                const res = await getAllPitches({
+                    category: categoryFromUrl,
+                    search: searchFromUrl,
+                    page: pageFromUrl,
+                    limit: limit
+                });
+
+                if (res?.success) {
+                    setPitches(res.data || []);
+                    setTotalPages(res.totalPages || Math.ceil((res.total || res.data?.length || 0) / limit) || 1);
+                } else {
+                    setPitches([]);
+                    setTotalPages(1);
+                }
+            } catch (err) {
+                console.error("Failed to fetch pitches:", err);
+                setPitches([]);
+                setTotalPages(1);
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchPitches();
+    }, [categoryFromUrl, searchFromUrl, pageFromUrl]);
+
+    // Page Handler
+    const handlePageChange = (newPage) => {
+        updateUrlParams(selectedCategory, search, newPage);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // Helper Function for Pitch Status Badge
+    const handleCategorySelect = (cat) => {
+        setSelectedCategory(cat);
+        updateUrlParams(cat, search, 1);
+    };
+
     const renderStatusBadge = (pitch) => {
         const isLocked = pitch.isFinalized;
         const isExpired = pitch.expiresAt && new Date(pitch.expiresAt) < new Date();
@@ -81,10 +155,10 @@ const PitchesPage = () => {
                     </p>
                 </div>
 
-                {/* Filter & Search Bar */}
+                {/* Filter & Search */}
                 <div className="bg-slate-900/80 border border-slate-800 backdrop-blur-md rounded-2xl p-4 mb-10 shadow-xl">
                     <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
-                        <form onSubmit={handleSearch} className="relative w-full md:w-96">
+                        <form onSubmit={(e) => e.preventDefault()} className="relative w-full md:w-96">
                             <input
                                 type="text"
                                 placeholder="Search by title, skill or topic..."
@@ -99,7 +173,7 @@ const PitchesPage = () => {
                             {CATEGORIES.map((cat) => (
                                 <button
                                     key={cat}
-                                    onClick={() => setSelectedCategory(cat)}
+                                    onClick={() => handleCategorySelect(cat)}
                                     className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${selectedCategory === cat
                                         ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
                                         : 'bg-slate-800/80 text-slate-400 hover:bg-slate-800 hover:text-slate-200'
@@ -112,7 +186,7 @@ const PitchesPage = () => {
                     </div>
                 </div>
 
-                {/* Pitches Grid */}
+                {/* Grid Content */}
                 {loading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -126,62 +200,70 @@ const PitchesPage = () => {
                         <p className="text-slate-500 text-sm mt-1">Try adjusting your filter or search criteria.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {pitches.map((pitch) => (
-                            <div key={pitch._id} className="group bg-slate-900/60 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl p-6 transition-all flex flex-col justify-between">
-                                <div>
-                                    <div className="flex justify-between items-center mb-3">
-                                        <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                                            {pitch.category}
-                                        </span>
+                    <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {pitches.map((pitch) => (
+                                <div key={pitch._id} className="group bg-slate-900/60 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl p-6 transition-all flex flex-col justify-between">
+                                    <div>
+                                        <div className="flex justify-between items-center mb-3">
+                                            <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                                                {pitch.category}
+                                            </span>
+                                            {renderStatusBadge(pitch)}
+                                        </div>
 
-                                        {/* Dynamic Status Badge */}
-                                        {renderStatusBadge(pitch)}
-                                    </div>
-
-                                    <h2 className="text-xl font-bold text-slate-100 group-hover:text-indigo-400 transition-colors line-clamp-1 mb-2">
-                                        {pitch.title}
-                                    </h2>
-                                    <p className="text-slate-400 text-xs sm:text-sm line-clamp-3 mb-4">
-                                        {pitch.description}
-                                    </p>
-                                    <div className="mb-6">
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {pitch.requiredSkills?.slice(0, 4).map((skill, idx) => (
-                                                <span key={idx} className="bg-slate-950 border border-slate-800 text-slate-300 text-[11px] px-2 py-0.5 rounded-md">
-                                                    {skill}
-                                                </span>
-                                            ))}
+                                        <h2 className="text-xl font-bold text-slate-100 group-hover:text-indigo-400 transition-colors line-clamp-1 mb-2">
+                                            {pitch.title}
+                                        </h2>
+                                        <p className="text-slate-400 text-xs sm:text-sm line-clamp-3 mb-4">
+                                            {pitch.description}
+                                        </p>
+                                        <div className="mb-6">
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {pitch.requiredSkills?.slice(0, 4).map((skill, idx) => (
+                                                    <span key={`${pitch._id}-${skill}-${idx}`} className="bg-slate-950 border border-slate-800 text-slate-300 text-[11px] px-2 py-0.5 rounded-md">
+                                                        {skill}
+                                                    </span>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
+                                    <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
+                                        <span className="text-xs text-slate-400 flex items-center gap-1">
+                                            <Users className="w-3.5 h-3.5 text-slate-500" /> {pitch.members?.length || 1} Member(s)
+                                        </span>
+                                        {pitch.expiresAt && new Date(pitch.expiresAt) < new Date() ? (
+                                            <button disabled className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 cursor-not-allowed opacity-60">
+                                                Expired <ArrowRight className="w-3.5 h-3.5" />
+                                            </button>
+                                        ) : (
+                                            <Link href={`/pitches/${pitch._id}`} className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-400 hover:text-indigo-300">
+                                                View Details <ArrowRight className="w-3.5 h-3.5" />
+                                            </Link>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
-                                    <span className="text-xs text-slate-400 flex items-center gap-1">
-                                        <Users className="w-3.5 h-3.5 text-slate-500" /> {pitch.members?.length || 1} Member(s)
-                                    </span>
-                                    {pitch.expiresAt && new Date(pitch.expiresAt) < new Date() ? (
-                                        <button
-                                            disabled
-                                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 cursor-not-allowed opacity-60"
-                                        >
-                                            Expired <ArrowRight className="w-3.5 h-3.5" />
-                                        </button>
-                                    ) : (
-                                        <Link
-                                            href={`/pitches/${pitch._id}`}
-                                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-400 hover:text-indigo-300"
-                                        >
-                                            View Details <ArrowRight className="w-3.5 h-3.5" />
-                                        </Link>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+
+                        {/* Reusable Pagination */}
+                        <Pagination
+                            currentPage={pageFromUrl}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                        />
+                    </>
                 )}
             </div>
         </div>
     );
 };
+
+// Main Export Wrapped with Suspense boundary
+const PitchesPage = () => (
+    <Suspense fallback={<div className="min-h-screen bg-slate-950" />}>
+        <PitchesContent />
+    </Suspense>
+);
 
 export default PitchesPage;
