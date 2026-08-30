@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Search, BookOpen, Filter } from 'lucide-react';
+import { Search, BookOpen, Filter, ArrowRight } from 'lucide-react';
 import { getPublicCurriculum } from '@/lib/api/curriculum';
 import Pagination from '@/components/common/Pagination';
 
@@ -84,7 +84,8 @@ function LandingCurriculumContent() {
                 console.error("Failed to load curriculum:", error);
                 setResources([]);
                 setTotalPages(1);
-            } finally {
+            }
+            finally {
                 setLoading(false);
             }
         };
@@ -108,17 +109,28 @@ function LandingCurriculumContent() {
         <div className="min-h-screen bg-[#070c18] text-slate-100 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto space-y-8">
 
-                {/* Hero Header */}
-                <div className="text-center space-y-4 max-w-3xl mx-auto">
-                    <span className="px-4 py-1.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs font-semibold rounded-full uppercase tracking-wider">
-                        Academic Structure
-                    </span>
-                    <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
-                        Explore Our Curriculum
-                    </h1>
-                    <p className="text-sm sm:text-base text-slate-400">
-                        Browse course modules, lecture slides, syllabus guidelines, and academic reference materials.
-                    </p>
+                {/* Hero Header with Go to Classroom CTA */}
+                <div className="bg-gradient-to-r from-indigo-950/40 via-[#0d1527] to-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-2xl">
+                    <div className="space-y-3 max-w-2xl">
+                        <span className="px-3.5 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs font-semibold rounded-full uppercase tracking-wider inline-block">
+                            Academic Structure
+                        </span>
+                        <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+                            Explore Our Curriculum
+                        </h1>
+                        <p className="text-sm sm:text-base text-slate-400 leading-relaxed">
+                            Browse course modules, lecture slides, syllabus guidelines, and academic reference materials.
+                        </p>
+                    </div>
+
+                    <Link
+                        href="/classroom"
+                        className="inline-flex items-center gap-2 px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-2xl shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 transition-all shrink-0 border border-indigo-400/30 group"
+                    >
+                        <BookOpen size={18} />
+                        <span>Go to Classroom</span>
+                        <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                    </Link>
                 </div>
 
                 {/* Control Bar: Department, Search & Semester */}
