@@ -23,7 +23,7 @@ const SEMESTERS = ['All', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th'
 const DEPARTMENTS = ['CSE', 'EEE', 'ECE', 'Civil'];
 const CLASSROOM_CATEGORIES = [
     { id: 'All', label: 'All Categories' },
-    { id: 'outline', label: 'Outline' },
+    { id: 'book', label: 'Book' },
     { id: 'mid', label: 'Midterm Exam' },
     { id: 'final', label: 'Final Exam' }
 ];

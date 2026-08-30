@@ -125,7 +125,7 @@ function LandingCurriculumContent() {
 
                     <Link
                         href="/classroom"
-                        className="inline-flex items-center gap-2 px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-2xl shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 transition-all shrink-0 border border-indigo-400/30 group"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-2xl shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 transition-all shrink-0 border border-indigo-400/30 group"
                     >
                         <BookOpen size={18} />
                         <span>Go to Classroom</span>

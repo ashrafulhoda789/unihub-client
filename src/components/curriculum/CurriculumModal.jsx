@@ -237,7 +237,7 @@ export default function CurriculumModal({ isOpen, onClose, onSubmit, initialData
                             </label>
                             <div className="grid grid-cols-3 gap-2 bg-slate-900/90 p-1 rounded-lg border border-slate-800">
                                 {[
-                                    { id: 'outline', label: 'Outline' },
+                                    { id: 'book', label: 'Book' },
                                     { id: 'mid', label: 'Midterm Exam' },
                                     { id: 'final', label: 'Final Exam' }
                                 ].map((tab) => (
