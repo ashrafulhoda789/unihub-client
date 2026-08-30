@@ -12,6 +12,8 @@ export default function CurriculumModal({ isOpen, onClose, onSubmit, initialData
         semester: '1st',
         department: 'CSE',
         description: '',
+        highlights: [],      
+        highlightsInput: '',
         resourceLink: '',
         fileUrl: '',
         publicId: ''
@@ -22,7 +24,11 @@ export default function CurriculumModal({ isOpen, onClose, onSubmit, initialData
     useEffect(() => {
         if (initialData) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
-            setFormData(initialData);
+            setFormData({
+                ...initialData,
+                highlights: initialData.highlights || [],
+                highlightsInput: initialData.highlights ? initialData.highlights.join(', ') : ''
+            });
         } else {
             setFormData({
                 title: '',
@@ -32,6 +38,8 @@ export default function CurriculumModal({ isOpen, onClose, onSubmit, initialData
                 semester: '1st',
                 department: 'CSE',
                 description: '',
+                highlights: [],
+                highlightsInput: '',
                 resourceLink: '',
                 fileUrl: '',
                 publicId: ''
@@ -51,7 +59,7 @@ export default function CurriculumModal({ isOpen, onClose, onSubmit, initialData
                 setFormData(prev => ({
                     ...prev,
                     fileUrl: uploadRes.url,
-                    documentType: uploadRes.type // 'pdf' | 'image' | 'video' | 'document'
+                    documentType: uploadRes.type || 'pdf'
                 }));
             }
         } catch (error) {
@@ -61,9 +69,26 @@ export default function CurriculumModal({ isOpen, onClose, onSubmit, initialData
         }
     };
 
+    const handleHighlightsChange = (e) => {
+        const value = e.target.value;
+        // কমা দিয়ে ভাগ করে অ্যারে বানানো
+        const parsedArray = value
+            .split(',')
+            .map(item => item.trim())
+            .filter(Boolean);
+
+        setFormData(prev => ({
+            ...prev,
+            highlightsInput: value,
+            highlights: parsedArray
+        }));
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSubmit(formData);
+        // highlightsInput বাদ দিয়ে ডাটা পাঠানো
+        const { highlightsInput, ...submitData } = formData;
+        onSubmit(submitData);
     };
 
     if (!isOpen) return null;
@@ -165,7 +190,7 @@ export default function CurriculumModal({ isOpen, onClose, onSubmit, initialData
                     <div>
                         <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Description</label>
                         <textarea
-                            rows="3"
+                            rows="2"
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             className="w-full rounded-xl bg-slate-900/80 border border-slate-800 p-2.5 text-sm text-white focus:border-blue-500 outline-none"
@@ -173,15 +198,30 @@ export default function CurriculumModal({ isOpen, onClose, onSubmit, initialData
                         />
                     </div>
 
+                    {/* Resource Highlights Input */}
                     <div>
-                        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Upload File (Cloudinary)</label>
+                        <label className="block text-xs font-semibold text-indigo-400 uppercase tracking-wider mb-1 flex justify-between">
+                            <span>Key Highlights</span>
+                            <span className="text-[10px] text-slate-400 lowercase">(separate with comma)</span>
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.highlightsInput}
+                            onChange={handleHighlightsChange}
+                            className="w-full rounded-xl bg-slate-900/80 border border-slate-800 p-2.5 text-sm text-white focus:border-blue-500 outline-none"
+                            placeholder="e.g., Dynamic Resizing Logic, Time Complexity, Heap Allocation"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Upload File</label>
                         <input
                             type="file"
                             onChange={handleFileUpload}
                             className="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-600/20 file:text-indigo-500 hover:file:bg-blue-600/30 cursor-pointer"
                         />
-                        {uploading && <p className="text-xs text-blue-400 mt-1">Uploading file...</p>}
-                        {formData.fileUrl && <p className="text-xs text-emerald-400 mt-1">✓ File Attached</p>}
+                        {uploading && <p className="text-xs text-blue-400 mt-1 animate-pulse">Uploading file...</p>}
+                        {formData.fileUrl && !uploading && <p className="text-xs text-emerald-400 mt-1">✓ File Attached</p>}
                     </div>
 
                     <div>

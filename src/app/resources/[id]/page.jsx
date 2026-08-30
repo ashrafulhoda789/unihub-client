@@ -64,7 +64,7 @@ export default function CourseDetailPage({ params }) {
                         href="/resources"
                         className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm font-medium transition-colors bg-slate-900/60 border border-slate-800 px-4 py-2 rounded-xl"
                     >
-                        <ArrowLeft size={16} /> Back to Resources
+                        <ArrowLeft size={16} /> Back to Curriculum
                     </Link>
                     <div className="flex gap-2">
                         <button className="p-2.5 bg-slate-900/60 hover:bg-slate-800 text-slate-300 rounded-xl border border-slate-800 transition-colors" title="Bookmark">
@@ -88,7 +88,7 @@ export default function CourseDetailPage({ params }) {
 
                             <div className="flex flex-wrap items-center gap-2.5">
                                 <span className="px-3 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs font-semibold rounded-full uppercase tracking-wider">
-                                    {course.documentType || 'Slide'}
+                                    {course.documentType || 'PDF'}
                                 </span>
                                 <span className="px-3 py-1 bg-slate-800 text-slate-300 text-xs font-semibold rounded-full uppercase">
                                     {course.semester} Semester
@@ -116,23 +116,30 @@ export default function CourseDetailPage({ params }) {
                                     <BookOpen size={16} className="text-indigo-400" /> Resource Overview
                                 </h3>
                                 <p className="text-sm text-slate-300 leading-relaxed bg-slate-900/50 p-4 rounded-xl border border-slate-800/80 whitespace-pre-line">
-                                    {course.description || "This resource contains comprehensive slides and notes covering core topics, implementation guidelines, and structural diagrams."}
+                                    {course.description || "This resource contains detailed academic content and guidelines for this course."}
                                 </p>
                             </div>
 
-                            {/* Core Topics Covered Checklist */}
+                            {/* Dynamic Core Topics / Highlights Checklist */}
                             <div>
                                 <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2 mb-3">
                                     <CheckCircle2 size={16} className="text-indigo-400" /> Key Topics & Modules
                                 </h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                                    {['Dynamic Resizing Logic', 'Amortized Time Complexity Analysis', 'Memory Allocation in Heap', 'Array Vs Dynamic Array Comparison'].map((topic, i) => (
-                                        <div key={i} className="flex items-center gap-2 p-3 bg-slate-900/40 rounded-xl border border-slate-800/60 text-slate-300">
-                                            <FileCheck size={14} className="text-emerald-400 flex-shrink-0" />
-                                            <span>{topic}</span>
-                                        </div>
-                                    ))}
-                                </div>
+
+                                {course.highlights && course.highlights.length > 0 ? (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                        {course.highlights.map((topic, i) => (
+                                            <div key={i} className="flex items-center gap-2 p-3 bg-slate-900/40 rounded-xl border border-slate-800/60 text-slate-300">
+                                                <FileCheck size={14} className="text-emerald-400 flex-shrink-0" />
+                                                <span>{topic}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-xs text-slate-500 italic bg-slate-900/30 p-3 rounded-xl border border-slate-800/40">
+                                        No specific highlights specified for this resource.
+                                    </p>
+                                )}
                             </div>
                         </div>
 
@@ -213,7 +220,7 @@ export default function CourseDetailPage({ params }) {
                         {/* Resource Metadata Info Card */}
                         <div className="bg-[#0d1527]/90 backdrop-blur-md rounded-2xl border border-slate-800 p-6 shadow-xl space-y-4">
                             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider pb-2 border-b border-slate-800">
-                                Metadata Specifications
+                                Specifications
                             </h3>
 
                             <div className="space-y-3.5 text-xs">
@@ -230,9 +237,9 @@ export default function CourseDetailPage({ params }) {
                                     <span className="font-semibold text-indigo-400 uppercase">{course.documentType || 'PDF'}</span>
                                 </div>
                                 <div className="flex justify-between items-center text-slate-300">
-                                    <span className="text-slate-500 flex items-center gap-1.5"><Clock size={14} /> Last Updated</span>
+                                    <span className="text-slate-500 flex items-center gap-1.5"><Clock size={14} /> Uploaded Date</span>
                                     <span className="font-semibold text-white">
-                                        {course.updatedAt ? new Date(course.updatedAt).toLocaleDateString() : 'N/A'}
+                                        {course.createdAt ? new Date(course.createdAt).toLocaleDateString() : 'N/A'}
                                     </span>
                                 </div>
                             </div>
@@ -243,10 +250,10 @@ export default function CourseDetailPage({ params }) {
                             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Provided By</h3>
                             <div className="flex items-center gap-3 pt-1">
                                 <div className="w-10 h-10 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded-full flex items-center justify-center font-bold text-sm">
-                                    {course.uploadedBy ? course.uploadedBy.charAt(0).toUpperCase() : 'F'}
+                                    {course.uploadedBy ? course.uploadedBy.charAt(0).toUpperCase() : 'A'}
                                 </div>
                                 <div>
-                                    <p className="text-sm font-semibold text-white">{course.uploadedBy ? course.uploadedBy.split('@')[0] : 'Faculty Member'}</p>
+                                    <p className="text-sm font-semibold text-white">{course.uploadedBy ? course.uploadedBy.split('@')[0] : 'Contributor'}</p>
                                     <p className="text-xs text-slate-400">{course.uploadedBy || 'Academic Faculty'}</p>
                                 </div>
                             </div>
