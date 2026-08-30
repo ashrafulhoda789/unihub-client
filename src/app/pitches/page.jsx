@@ -147,7 +147,7 @@ const PitchesContent = () => {
                     <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs font-semibold uppercase tracking-wider mb-4">
                         <Sparkles className="w-3.5 h-3.5" /> Innovation Hub
                     </span>
-                    <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
+                    <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-white mb-4">
                         Explore Innovative <span className="text-indigo-500">Pitches</span>
                     </h1>
                     <p className="text-slate-400 text-base sm:text-lg">

@@ -17,19 +17,16 @@ export default function PitchCard({ pitch, onUpdate, currentUserId }) {
         router.push(`/dashboard/student/my-pitches/${pitch._id}`);
     };
 
-    // মোডাল খোলার হ্যান্ডলার
     const openModal = (e) => {
         e.stopPropagation();
         setIsModalOpen(true);
     };
 
-    // মোডাল বন্ধ করার হ্যান্ডলার
     const closeModal = (e) => {
         if (e) e.stopPropagation();
         setIsModalOpen(false);
     };
 
-    // মোডালের কনফার্ম বাটনে ফাইনাল টিম কল
     const handleConfirmFinalize = async (e) => {
         e.stopPropagation();
         setIsLoading(true);

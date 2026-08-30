@@ -110,12 +110,12 @@ function LandingCurriculumContent() {
             <div className="max-w-7xl mx-auto space-y-8">
 
                 {/* Hero Header with Go to Classroom CTA */}
-                <div className="bg-gradient-to-r from-indigo-950/40 via-[#0d1527] to-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-2xl">
+                <div className="bg-gradient-to-r from-indigo-950/40 via-[#0d1527] to-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-2xl">
                     <div className="space-y-3 max-w-2xl">
                         <span className="px-3.5 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs font-semibold rounded-full uppercase tracking-wider inline-block">
                             Academic Structure
                         </span>
-                        <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+                        <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
                             Explore Our Curriculum
                         </h1>
                         <p className="text-sm sm:text-base text-slate-400 leading-relaxed">

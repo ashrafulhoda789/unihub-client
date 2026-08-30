@@ -10,6 +10,8 @@ import ConsoleOutput from "./Console";
 import TabBar from "./TabBar";
 import CreateFileModal from "./CreateFileModal";
 import DeleteConfirmModal from "./DeleteConfirmModal";
+import { useSession } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 export default function SandboxView() {
     const [files, setFiles] = useState(initialFiles);
@@ -34,6 +36,13 @@ export default function SandboxView() {
 
     const activeFile = files[activeFileId];
 
+    const router = useRouter();
+
+    const session = useSession();
+    // console.log(session);
+    const user = session?.data?.user;
+    // console.log(user);
+
     const handleToggleSelect = (fileId) => {
         setSelectedFileIds((prev) =>
             prev.includes(fileId) ? prev.filter((id) => id !== fileId) : [...prev, fileId]
@@ -41,6 +50,12 @@ export default function SandboxView() {
     };
 
     const handleDownloadSelected = async () => {
+
+        if(!user){
+            router.push('/auth/login');
+            return
+        }
+
         if (selectedFileIds.length === 0) return;
 
         if (selectedFileIds.length === 1) {
