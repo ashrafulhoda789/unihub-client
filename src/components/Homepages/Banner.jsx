@@ -77,7 +77,7 @@ export default function HeroBanner() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.4 }}
-                        className="mt-16 grid grid-cols-2 md:grid-cols-3 gap-4 text-left"
+                        className="mt-16 flex flex-col md:flex-row gap-4 text-left"
                     >
                         <div className="p-4 rounded-xl bg-slate-800/40 border border-slate-800 flex items-center gap-3">
                             <div className="p-2.5 rounded-lg bg-indigo-500/10 text-indigo-400">

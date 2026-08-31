@@ -34,14 +34,15 @@ export default function Sidebar() {
     const isAdmin = userRole === "admin";
     const isFaculty = userRole === "faculty";
 
-    // Navigation Links based on Role
     const adminNav = [
+        { name: "Overview", href: "/dashboard/admin", icon: LayoutDashboard },
         { name: "User Management", href: "/dashboard/admin/user-management", icon: Users },
         { name: "Curriculum & Resources", href: "/dashboard/admin/resources", icon: BookOpen },
         { name: "Profile", href: "/dashboard/admin/profile", icon: User },
     ];
 
     const studentNav = [
+        { name: "Overview", href: "/dashboard/student", icon: LayoutDashboard },
         { name: "My Pitches", href: "/dashboard/student/my-pitches", icon: FolderGit2 },
         { name: "My Pitch Request", href: "/dashboard/student/pitch-request", icon: FolderCheck },
         { name: "IDE Sandbox", href: "/sandbox", icon: Code2 },
@@ -49,6 +50,7 @@ export default function Sidebar() {
     ];
 
     const facultyNav = [
+        { name: "Overview", href: "/dashboard/faculty", icon: LayoutDashboard },
         { name: "My Pitch", href: "/dashboard/faculty/my-pitches", icon: FolderGit2 },
         { name: "Supervision Requests", href: "/dashboard/faculty/faculty-pitch-request", icon: CheckSquare },
         { name: "Curriculum & Resources", href: "/dashboard/faculty/resources", icon: BookOpen },
@@ -69,8 +71,8 @@ export default function Sidebar() {
 
     return (
         <>
-            {/* Mobile Top Navbar with Hamburger Toggle */}
-            <div className="md:hidden sticky top-0 z-40 bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between">
+            {/* Mobile & Tablet Top Navbar with Hamburger Toggle */}
+            <div className="lg:hidden sticky top-0 z-40 bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between">
                 <Link href="/" className="flex items-center gap-2 font-bold text-lg text-white">
                     <div className="p-1.5 rounded-lg bg-indigo-600/20 text-indigo-400 border border-indigo-500/30">
                         <GraduationCap className="w-5 h-5" />
@@ -86,17 +88,17 @@ export default function Sidebar() {
                 </button>
             </div>
 
-            {/* Mobile Drawer Overlay Backdrop */}
+            {/* Mobile & Tablet Drawer Overlay Backdrop */}
             {isMobileOpen && (
                 <div
-                    className="fixed inset-0 z-40 bg-slate-950/80 backdrop-blur-sm md:hidden"
+                    className="fixed inset-0 z-40 bg-slate-950/80 backdrop-blur-sm lg:hidden"
                     onClick={() => setIsMobileOpen(false)}
                 />
             )}
 
-            {/* Sidebar Container (Desktop Sticky + Mobile Drawer) */}
+            {/* Sidebar Container (Desktop Sticky + Mobile/Tablet Drawer) */}
             <aside
-                className={`fixed md:sticky top-0 left-0 z-50 h-screen w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between transition-transform duration-300 ease-in-out shrink-0 ${isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+                className={`fixed lg:sticky top-0 left-0 z-50 h-screen w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between transition-transform duration-300 ease-in-out shrink-0 ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
                     }`}
             >
                 <div>
@@ -136,7 +138,8 @@ export default function Sidebar() {
                     <nav className="px-3 space-y-1">
                         {navItems.map((item) => {
                             const Icon = item.icon;
-                            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                            // Check exact match for overview routes or startsWith for nested paths
+                            const isActive = pathname === item.href || (item.href !== "/dashboard/admin" && item.href !== "/dashboard/student" && item.href !== "/dashboard/faculty" && pathname.startsWith(item.href + "/"));
 
                             return (
                                 <Link
@@ -144,8 +147,8 @@ export default function Sidebar() {
                                     href={item.href}
                                     onClick={() => setIsMobileOpen(false)}
                                     className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${isActive
-                                        ? "bg-indigo-600/15 text-indigo-300 border border-indigo-500/30 shadow-sm"
-                                        : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/60"
+                                            ? "bg-indigo-600/15 text-indigo-300 border border-indigo-500/30 shadow-sm"
+                                            : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/60"
                                         }`}
                                 >
                                     <div className="flex items-center gap-3">

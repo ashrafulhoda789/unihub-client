@@ -35,8 +35,8 @@ export default function Footer() {
                         <ul className="space-y-2 text-xs">
                             <li><Link href="/pitches" className="hover:text-indigo-400 transition-colors">Open Pitch Room</Link></li>
                             <li><Link href="/resources" className="hover:text-indigo-400 transition-colors">Curriculum Library</Link></li>
-                            <li><Link href="/ide" className="hover:text-indigo-400 transition-colors">Sandboxed IDE</Link></li>
-                            <li><Link href="/dashboard/student" className="hover:text-indigo-400 transition-colors">Agile Workspace</Link></li>
+                            <li><Link href="/classroom" className="hover:text-indigo-400 transition-colors">Classroom</Link></li>
+                            <li><Link href="/sandbox" className="hover:text-indigo-400 transition-colors">Sandboxed IDE</Link></li>
                         </ul>
                     </div>
 

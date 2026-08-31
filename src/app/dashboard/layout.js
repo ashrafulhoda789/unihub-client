@@ -3,7 +3,7 @@ import Sidebar from "@/components/dashboard/SIdebar";
 
 export default function DashboardLayout({ children }) {
     return (
-        <div className="h-screen w-full overflow-hidden bg-slate-950 flex flex-col md:flex-row">
+        <div className="h-screen w-full overflow-hidden bg-slate-950 flex flex-col lg:flex-row">
 
             <Sidebar />
 

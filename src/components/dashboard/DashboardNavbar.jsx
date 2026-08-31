@@ -2,6 +2,7 @@
 
 import { useSession } from "@/lib/auth-client";
 import { Search, Bell, Sparkles, ShieldCheck, UserCheck } from "lucide-react";
+import Image from "next/image";
 
 export default function DashboardNavbar() {
     const { data: session } = useSession();
@@ -11,7 +12,7 @@ export default function DashboardNavbar() {
     const isFaculty = userRole === "faculty";
 
     return (
-        <header className="hidden md:flex h-16 bg-slate-900/80 border-b border-slate-800 px-6 items-center justify-between sticky top-0 z-30 backdrop-blur-md">
+        <header className="hidden lg:flex h-16 bg-slate-900/80 border-b border-slate-800 px-6 items-center justify-between sticky top-0 z-30 backdrop-blur-md">
 
             {/* Left: Global Workspace Search */}
             <div className="flex items-center gap-4 flex-1 max-w-md">
@@ -48,9 +49,21 @@ export default function DashboardNavbar() {
 
                 {/* User Summary */}
                 <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 flex items-center justify-center font-bold text-xs uppercase">
-                        {user?.name ? user.name[0] : "U"}
-                    </div>
+                    {user?.image || user?.avatar ? (
+                        <div className="w-8 h-8 rounded-lg overflow-hidden border border-indigo-500/30 relative">
+                            <Image
+                                src={user.image }
+                                alt={user?.name || "User"}
+                                width={32}
+                                height={32}
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
+                    ) : (
+                        <div className="w-8 h-8 rounded-lg bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 flex items-center justify-center font-bold text-xs uppercase">
+                            {user?.name ? user.name[0] : "U"}
+                        </div>
+                    )}
                     <div className="text-left">
                         <p className="text-xs font-semibold text-white leading-tight">{user?.name || "User Account"}</p>
                         <p className="text-[10px] text-slate-400 capitalize flex items-center gap-1 mt-0.5">

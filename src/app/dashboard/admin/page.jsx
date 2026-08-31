@@ -41,7 +41,6 @@ const AdminDashboardPage = async () => {
 
         combinedResources = [...curriculumList, ...classroomList];
 
-        // শর্ট করে লেটেস্ট ৪টি রিসোর্স আলাদা করা
         const sortedResources = [...combinedResources];
         sortedResources.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
         latestResources = sortedResources.slice(0, 4);
@@ -51,11 +50,11 @@ const AdminDashboardPage = async () => {
     }
 
     return (
-        <div className="p-4 sm:p-6 lg:p-8 space-y-6 lg:space-y-8 min-h-screen text-slate-100">
+        <div className="p-4 sm:p-6 lg:p-8 space-y-6 lg:space-y-8 max-w-7xl mx-auto text-slate-100">
 
             {/* Page Header */}
             <div className="flex flex-col gap-1">
-                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">Admin Dashboard</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">Analytics</h1>
                 <p className="text-xs sm:text-sm text-slate-400">Welcome back! Here is a summary of overall system activities.</p>
             </div>
 
