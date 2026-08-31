@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signUp, signIn } from "@/lib/auth-client";
+import { signUp, signIn, authClient } from "@/lib/auth-client";
 import { GraduationCap, Eye, EyeOff, Lock, Mail, User, ArrowRight } from "lucide-react";
 import RoleSelectionModal from "@/components/modals/RoleSelectionModal";
 
@@ -53,28 +53,26 @@ export default function RegisterPage() {
         setIsRoleModalOpen(true);
     };
 
-    // Final Registration Call with Selected Role
     const handleRoleConfirmed = async (selectedRole) => {
         setLoading(true);
         setError("");
 
-        await signUp.email(
+        await authClient.signUp.email(
             {
                 email: formData.email,
                 password: formData.password,
                 name: formData.name,
-                role: selectedRole, 
+                requestedRole: selectedRole,
             },
             {
                 onSuccess: () => {
                     setIsRoleModalOpen(false);
-                    // Redirect based on selected role
-                    // const targetDashboard = selectedRole === "faculty" ? "/dashboard/faculty" : "/dashboard/student";
+                    setLoading(false);
                     router.push('/');
                 },
                 onError: (ctx) => {
                     setIsRoleModalOpen(false);
-                    setError(ctx.error.message || "Registration failed. Email might already exist.");
+                    setError(ctx.error.message || "Registration failed.");
                     setLoading(false);
                 },
             }

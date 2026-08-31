@@ -8,17 +8,17 @@ const db = client.db('unihub_db');
 
 export const auth = betterAuth({
     database: mongodbAdapter(db, {
-        // Optional: if you don't provide a client, database transactions won't be enabled.
+        
         client
     }),
     emailAndPassword: {
         enabled: true,
     },
     socialProviders: {
-        google: { 
-            clientId: process.env.GOOGLE_CLIENT_ID, 
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET, 
-        }, 
+        google: {
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        },
     },
     user: {
         additionalFields: {
@@ -26,11 +26,29 @@ export const auth = betterAuth({
                 type: "string",
                 required: true,
                 defaultValue: "student",
-                input: true, 
+                input: true,
+            },
+        },
+    },
+    databaseHooks: {
+        user: {
+            create: {
+                before: async (user) => {
+                    const chosenRole = user.requestedRole === "faculty" ? "faculty" : "student";
+
+                    return {
+                        data: {
+                            ...user,
+                            role: chosenRole,
+                        },
+                    };
+                },
             },
         },
     },
     plugins: [
-        admin()
+        admin({
+            defaultRole: 'student'
+        })
     ]
 });
