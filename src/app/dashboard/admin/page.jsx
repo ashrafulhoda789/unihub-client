@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import React from 'react';
 import { getAllPitches } from '@/lib/api/myPitch';
 import { getPublicCurriculum } from '@/lib/api/curriculum';

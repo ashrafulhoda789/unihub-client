@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import HeroBanner from "@/components/Homepages/Banner";
 import CallToActionSection from "@/components/Homepages/CallToActionSection";
 import CoreFeaturesSection from "@/components/Homepages/CoreFeaturesSection";

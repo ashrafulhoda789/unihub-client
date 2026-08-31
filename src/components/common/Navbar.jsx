@@ -30,7 +30,7 @@ export default function Navbar() {
     const user = session?.user;
     const userRole = (user?.role || "").toLowerCase();
 
-    console.log('user navbar', user);
+    // console.log('user navbar', user);
 
     // Dynamic Dashboard Route based on User Role (Admin, Faculty, Student)
     const dashboardPath = userRole === "admin"
