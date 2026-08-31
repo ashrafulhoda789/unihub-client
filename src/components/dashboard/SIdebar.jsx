@@ -19,7 +19,8 @@ import {
     UserCheck,
     ChevronRight,
     LayoutDashboard,
-    FolderCheck
+    FolderCheck,
+    Users
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -29,9 +30,17 @@ export default function Sidebar() {
     const [isMobileOpen, setIsMobileOpen] = useState(false);
 
     const user = session?.user;
-    const isFaculty = user?.role === "faculty" || user?.role === "FACULTY";
+    const userRole = (user?.role || "").toLowerCase();
+    const isAdmin = userRole === "admin";
+    const isFaculty = userRole === "faculty";
 
     // Navigation Links based on Role
+    const adminNav = [
+        { name: "User Management", href: "/dashboard/admin/user-management", icon: Users },
+        { name: "Curriculum & Resources", href: "/dashboard/admin/resources", icon: BookOpen },
+        { name: "Profile", href: "/dashboard/admin/profile", icon: User },
+    ];
+
     const studentNav = [
         { name: "My Pitches", href: "/dashboard/student/my-pitches", icon: FolderGit2 },
         { name: "My Pitch Request", href: "/dashboard/student/pitch-request", icon: FolderCheck },
@@ -46,7 +55,7 @@ export default function Sidebar() {
         { name: "Profile", href: "/dashboard/faculty/profile", icon: User },
     ];
 
-    const navItems = isFaculty ? facultyNav : studentNav;
+    const navItems = isAdmin ? adminNav : (isFaculty ? facultyNav : studentNav);
 
     const handleSignOut = async () => {
         await signOut({
@@ -105,13 +114,15 @@ export default function Sidebar() {
                     <div className="px-6 py-4">
                         <div className="px-3 py-2 bg-slate-950/60 border border-slate-800 rounded-xl flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                {isFaculty ? (
+                                {isAdmin ? (
+                                    <ShieldCheck className="w-4 h-4 text-rose-400" />
+                                ) : isFaculty ? (
                                     <ShieldCheck className="w-4 h-4 text-cyan-400" />
                                 ) : (
                                     <UserCheck className="w-4 h-4 text-indigo-400" />
                                 )}
                                 <span className="text-xs font-semibold text-slate-300 capitalize">
-                                    {isFaculty ? "Faculty Portal" : "Student Portal"}
+                                    {isAdmin ? "Admin Portal" : (isFaculty ? "Faculty Portal" : "Student Portal")}
                                 </span>
                             </div>
                             <span className="flex h-2 w-2 relative">
@@ -133,8 +144,8 @@ export default function Sidebar() {
                                     href={item.href}
                                     onClick={() => setIsMobileOpen(false)}
                                     className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${isActive
-                                            ? "bg-indigo-600/15 text-indigo-300 border border-indigo-500/30 shadow-sm"
-                                            : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/60"
+                                        ? "bg-indigo-600/15 text-indigo-300 border border-indigo-500/30 shadow-sm"
+                                        : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/60"
                                         }`}
                                 >
                                     <div className="flex items-center gap-3">

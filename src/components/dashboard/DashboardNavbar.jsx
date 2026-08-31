@@ -6,10 +6,11 @@ import { Search, Bell, Sparkles, ShieldCheck, UserCheck } from "lucide-react";
 export default function DashboardNavbar() {
     const { data: session } = useSession();
     const user = session?.user;
-    const isFaculty = user?.role === "faculty" || user?.role === "FACULTY";
+    const userRole = (user?.role || "").toLowerCase();
+    const isAdmin = userRole === "admin";
+    const isFaculty = userRole === "faculty";
 
     return (
-       
         <header className="hidden md:flex h-16 bg-slate-900/80 border-b border-slate-800 px-6 items-center justify-between sticky top-0 z-30 backdrop-blur-md">
 
             {/* Left: Global Workspace Search */}
@@ -53,7 +54,9 @@ export default function DashboardNavbar() {
                     <div className="text-left">
                         <p className="text-xs font-semibold text-white leading-tight">{user?.name || "User Account"}</p>
                         <p className="text-[10px] text-slate-400 capitalize flex items-center gap-1 mt-0.5">
-                            {isFaculty ? (
+                            {isAdmin ? (
+                                <span className="text-rose-400 flex items-center gap-0.5"><ShieldCheck className="w-3 h-3" /> Admin</span>
+                            ) : isFaculty ? (
                                 <span className="text-cyan-400 flex items-center gap-0.5"><ShieldCheck className="w-3 h-3" /> Faculty</span>
                             ) : (
                                 <span className="text-indigo-400 flex items-center gap-0.5"><UserCheck className="w-3 h-3" /> Student</span>

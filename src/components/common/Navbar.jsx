@@ -27,9 +27,14 @@ export default function Navbar() {
     const [searchQuery, setSearchQuery] = useState("");
 
     const user = session?.user;
+    const userRole = (user?.role || "").toLowerCase();
 
-    // Dynamic Dashboard Route based on User Role
-    const dashboardPath = user?.role === "faculty" ? "/dashboard/faculty" : "/dashboard/student";
+    // Dynamic Dashboard Route based on User Role (Admin, Faculty, Student)
+    const dashboardPath = userRole === "admin"
+        ? "/dashboard/admin"
+        : userRole === "faculty"
+            ? "/dashboard/faculty"
+            : "/dashboard/student";
 
     // Handle Logout
     const handleSignOut = async () => {
@@ -46,7 +51,7 @@ export default function Navbar() {
 
     const pathName = usePathname();
 
-    if(pathName.startsWith('/dashboard')){
+    if (pathName.startsWith('/dashboard')) {
         return null;
     }
 
@@ -122,9 +127,15 @@ export default function Navbar() {
                                                 <p className="text-xs font-semibold text-white truncate">{user.name}</p>
                                                 <p className="text-[10px] text-slate-400 truncate">{user.email}</p>
 
-                                                {/* Role Badge */}
+                                                {/* Dynamic Role Badge */}
                                                 <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-medium text-indigo-400 capitalize">
-                                                    {user.role === "faculty" ? <ShieldCheck className="w-3 h-3 text-cyan-400" /> : <UserCheck className="w-3 h-3 text-indigo-400" />}
+                                                    {userRole === "admin" ? (
+                                                        <ShieldCheck className="w-3 h-3 text-rose-400" />
+                                                    ) : userRole === "faculty" ? (
+                                                        <ShieldCheck className="w-3 h-3 text-cyan-400" />
+                                                    ) : (
+                                                        <UserCheck className="w-3 h-3 text-indigo-400" />
+                                                    )}
                                                     {user.role || "Student"}
                                                 </div>
                                             </div>
@@ -191,7 +202,7 @@ export default function Navbar() {
                     <Link href="/" className="block py-2 text-slate-300 hover:text-indigo-400">Home</Link>
                     <Link href="/pitches" className="block py-2 text-slate-300 hover:text-indigo-400">Open Pitches</Link>
                     <Link href="/resources" className="block py-2 text-slate-300 hover:text-indigo-400">Curriculum Library</Link>
-                    <Link href="/ide" className="block py-2 text-cyan-400">IDE Sandbox</Link>
+                    <Link href="/sandbox" className="block py-2 text-cyan-400">IDE Sandbox</Link>
 
                     <div className="pt-3 border-t border-slate-800 flex flex-col gap-2">
                         {user ? (
