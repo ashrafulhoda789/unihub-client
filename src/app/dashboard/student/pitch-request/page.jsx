@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Trash2, AlertTriangle, ExternalLink, Loader2, Clock, CheckCircle2, XCircle, Search, Filter } from 'lucide-react';
+import { Trash2, AlertTriangle, ExternalLink, Loader2, Clock, CheckCircle2, XCircle, Search, Filter, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { deletePitchRequest } from '@/lib/action/joinRequest';
@@ -74,7 +74,8 @@ export default function MyPitchRequestsPage() {
         fetchRequests();
     }, [fetchRequests]);
 
-    const handleStatusChange = (status) => {
+    const handleStatusChange = (e) => {
+        const status = e.target.value;
         setStatusFilter(status);
         setCurrentPage(1);
         updateURL(status, searchQuery, 1);
@@ -198,26 +199,28 @@ export default function MyPitchRequestsPage() {
 
             {/* Filter and Search Bar Container */}
             <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-3 sm:p-4 mb-8 flex flex-col lg:flex-row items-center justify-between gap-4 shadow-lg">
-                <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-                    <div className="flex items-center gap-2 px-2 text-slate-400 text-xs font-semibold tracking-wider">
-                        <Filter size={14} className="text-indigo-400" /> STATUS:
+
+                {/* Status Dropdown Filter */}
+                <div className="relative w-full lg:w-56">
+                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-400 pointer-events-none flex items-center gap-2">
+                        <Filter size={16} />
                     </div>
-                    <div className="flex items-center bg-slate-950/60 p-1 rounded-xl border border-slate-800/60 overflow-x-auto w-full sm:w-auto">
-                        {['ALL', 'PENDING', 'ACCEPTED', 'REJECTED'].map((statusOption) => (
-                            <button
-                                key={statusOption}
-                                onClick={() => handleStatusChange(statusOption)}
-                                className={`px-4 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition shrink-0 ${statusFilter === statusOption
-                                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                                        : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
-                                    }`}
-                            >
-                                {statusOption}
-                            </button>
-                        ))}
+                    <select
+                        value={statusFilter}
+                        onChange={handleStatusChange}
+                        className="w-full bg-slate-950/80 border border-slate-800 rounded-xl pl-10 pr-10 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500 transition appearance-none cursor-pointer"
+                    >
+                        <option value="ALL" className="bg-slate-900 text-white">ALL STATUS</option>
+                        <option value="PENDING" className="bg-slate-900 text-white">PENDING</option>
+                        <option value="ACCEPTED" className="bg-slate-900 text-white">ACCEPTED</option>
+                        <option value="REJECTED" className="bg-slate-900 text-white">REJECTED</option>
+                    </select>
+                    <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                        <ChevronDown size={16} />
                     </div>
                 </div>
 
+                {/* Search Input */}
                 <div className="relative w-full lg:w-80">
                     <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
                     <input
@@ -225,7 +228,7 @@ export default function MyPitchRequestsPage() {
                         placeholder="Search pitch, role or message..."
                         value={searchQuery}
                         onChange={handleSearchChange}
-                        className="w-full bg-slate-950/80 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+                        className="w-full bg-slate-950/80 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
                     />
                 </div>
             </div>
