@@ -308,7 +308,7 @@ function CurriculumContent() {
                         />
                     </div>
                 </div>
-                
+
                 {/* classroom category */}
                 {activeTab === 'classroom' && (
                     <div className="border-t border-slate-800/80 pt-4 w-full box-border">
@@ -368,6 +368,8 @@ function CurriculumContent() {
                         </div>
                     </div>
                 </div>
+
+              
             </div>
 
             {/* List and Pagination */}
