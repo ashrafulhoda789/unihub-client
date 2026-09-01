@@ -13,12 +13,12 @@ export default function PitchCard({ pitch, onUpdate, currentUserId, currentUserR
     const [isLoading, setIsLoading] = useState(false);
 
     const isOwner = pitch.createdBy?.toString() === currentUserId?.toString();
-
+    
     // Check if role is faculty/teacher (case-insensitive check)
-    const isTeacher = currentUserRole?.toLowerCase() === "faculty" || currentUserRole?.toLowerCase() === "teacher";
+    const isTeacher = currentUserRole?.toLowerCase() === "faculty";
 
     // Dynamic Workspace URL based on role
-    const workspaceUrl = isTeacher
+    const workspaceUrl = isTeacher 
         ? `/dashboard/faculty/my-pitches/${pitch.workspaceId || pitch._id}/workspace`
         : `/dashboard/student/my-pitches/${pitch.workspaceId || pitch._id}/workspace`;
 

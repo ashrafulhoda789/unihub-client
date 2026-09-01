@@ -73,8 +73,8 @@ export default function MyPitchesClient({ initialPitches, user }) {
                     <button
                         onClick={() => setFilterTab("ALL")}
                         className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${filterTab === "ALL"
-                                ? "bg-indigo-600 text-white shadow-md"
-                                : "text-slate-400 hover:text-white"
+                            ? "bg-indigo-600 text-white shadow-md"
+                            : "text-slate-400 hover:text-white"
                             }`}
                     >
                         All ({initialPitches.length})
@@ -82,8 +82,8 @@ export default function MyPitchesClient({ initialPitches, user }) {
                     <button
                         onClick={() => setFilterTab("MY_PITCH")}
                         className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${filterTab === "MY_PITCH"
-                                ? "bg-indigo-600 text-white shadow-md"
-                                : "text-slate-400 hover:text-white"
+                            ? "bg-indigo-600 text-white shadow-md"
+                            : "text-slate-400 hover:text-white"
                             }`}
                     >
                         My Pitch ({initialPitches.filter(p => p.createdBy?.toString() === currentUserId?.toString()).length})
@@ -128,6 +128,7 @@ export default function MyPitchesClient({ initialPitches, user }) {
                             pitch={pitch}
                             onUpdate={handleUpdate}
                             currentUserId={currentUserId}
+                            currentUserRole={user?.role}
                         />
                     ))}
                 </div>
