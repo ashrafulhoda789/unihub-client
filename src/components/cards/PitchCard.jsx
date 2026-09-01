@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { useState } from "react";
@@ -6,15 +7,24 @@ import { useRouter } from "next/navigation";
 import { Users, ShieldCheck, ArrowRight, Lock, Clock, UserPlus, ShieldAlert, Crown, AlertTriangle, Loader2 } from "lucide-react";
 import { finalizePitchTeam } from "@/lib/action/createPitch";
 
-export default function PitchCard({ pitch, onUpdate, currentUserId }) {
+export default function PitchCard({ pitch, onUpdate, currentUserId, currentUserRole }) {
     const router = useRouter();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
     const isOwner = pitch.createdBy?.toString() === currentUserId?.toString();
 
+    // Check if role is faculty/teacher (case-insensitive check)
+    const isTeacher = currentUserRole?.toLowerCase() === "faculty" || currentUserRole?.toLowerCase() === "teacher";
+
+    // Dynamic Workspace URL based on role
+    const workspaceUrl = isTeacher
+        ? `/dashboard/faculty/my-pitches/${pitch.workspaceId || pitch._id}/workspace`
+        : `/dashboard/student/my-pitches/${pitch.workspaceId || pitch._id}/workspace`;
+
     const handleCardClick = () => {
-        router.push(`/dashboard/student/my-pitches/${pitch._id}`);
+        const baseDashboard = isTeacher ? `/dashboard/faculty/my-pitches` : `/dashboard/student/my-pitches`;
+        router.push(`${baseDashboard}/${pitch._id}`);
     };
 
     const openModal = (e) => {
@@ -132,7 +142,7 @@ export default function PitchCard({ pitch, onUpdate, currentUserId }) {
                 <div className="pt-4 border-t border-slate-800/80">
                     {pitch.isFinalized ? (
                         <Link
-                            href={`/dashboard/student/my-pitches/${pitch.workspaceId || pitch._id}/workspace`}
+                            href={workspaceUrl}
                             onClick={(e) => e.stopPropagation()}
                             className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-600/20"
                         >
